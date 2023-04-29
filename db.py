@@ -1,122 +1,53 @@
-import os
-import sqlite3
+from flask_sqlalchemy import SQLAlchemy
 
-# From: https://goo.gl/YzypOI
-def singleton(cls):
-    instances = {}
+db = SQLAlchemy()
 
-    def getinstance():
-        if cls not in instances:
-            instances[cls] = cls()
-        return instances[cls]
+# your classes here
 
-    return getinstance
-
-
-class DatabaseDriver(object):
+class Puzzle(db.Model):
     """
-    Database driver for the Venmo app.
-    Handles with reading and writing data with the database.
+    Puzzle model 
     """
-
-    def __init__(self):
-        """
-        Secures a connection with the database and
-        stores it in an instance variable
-        """
-
-        self.conn = sqlite3.connect(
-            "todo.db", check_same_thread=False
-        )
-
-        self.delete_puzzle_table()
-        self.create_puzzle_table()
-
-    def create_puzzle_table(self):
-        """
-        Using SQL, create puzzle table
-        """
-
-        try:
-            self.conn.execute(
-                """
-                CREATE TABLE puzzle (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    word TEXT NOT NULL,
-                    hint TEXT NOT NULL
-                );
-                """
-            )
-        except Exception as e:
-            print(e)
-
-    def delete_puzzle_table(self):
-        """
-        Using SQL, deletes a puzzle table
-        """
-
-        self.conn.execute("DROP TABLE IF EXISTS puzzle;")
-
-    def get_all_puzzles(self):
-        """
-        Using SQL, gets all puzzles in the puzzle table
-        """
-
-        cursor = self.conn.execute("SELECT * FROM puzzle;")
-        puzzles = []
-
-        for row in cursor:
-            puzzles.append({"id" : row[0], "word": row[1], "hint": row[2]}) 
-        return puzzles
+    #Puzzle table with all the fields necessary to initialize the puzzle.
     
-    def insert_puzzle_table(self, word, hint):
-        """
-        Using SQL, adds a new puzzle in the puzzles table
-        """
-        cursor = self.conn.execute("INSERT INTO puzzle (word, hint) VALUES (?, ?);", (word, hint))
-        self.conn.commit()
-        return cursor.lastrowid
+    __tablename__ = "puzzle"
+    id = db.Column(db.Integer, primary_key = True, autoincrement=True)
+    word = db.Column(db.String, nullable=False)
+    hint = db.Column(db.String, nullable=False)
 
-    def get_puzzle_by_id(self, id):
+    def __init__(self, **kwargs):
         """
-        Using SQL, gets a puzzle by ID
+        Initializes a Puzzle object
         """
-        cursor = self.conn.execute("SELECT * FROM puzzle WHERE ID = ?;", (id,))
-
-        for row in cursor:
-            return {"id" : row[0], "word": row[1], "hint": row[2]}
-        return None
+        
+        self.word = kwargs.get("word", "")
+        self.hint = kwargs.get("hint","")
     
-    def update_puzzle_by_id(self, id, word, hint):
-        """
-        Using SQL, updates a puzzle by ID
-        """
-        self.conn.execute(
-            """
-            UPDATE puzzle
-            SET word = ?, hint = ?
-            WHERE id = ?;
-            """,
-            (word, hint, id)
-        )
-        self.conn.commit()
-     
-    def delete_puzzle_by_id(self, id):
-        """
-        Using SQL, deletes a puzzle by id
-        """
-        self.conn.execute(
-            """
-            DELETE FROM puzzle
-            WHERE id = ?;
-            """,
-            (id,)
-        )
 
-        self.conn.commit()
+    #serialize has 3 additional fields for students, instructors, and assignments which contain
+    #serialized elements from other tables.
+    def serialize(self):
+        """
+        Siderializes a Puzzle object
+        """
+
+        return {
+            "id": self.id,
+            "word": self.word,
+            "hint": self.hint,
 
 
+        }
+    #simple serialize here returns course values that don't have personal 
+    #information about users, etc.
+    def simple_serialize(self):
+        """
+        Siderializes a Task object
+        """
 
-# Only <=1 instance of the database driver
-# exists within the app at all times
-DatabaseDriver = singleton(DatabaseDriver)
+        return {
+            "id": self.id,
+            "code": self.word,
+            "name": self.hint,
+
+        }
