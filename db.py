@@ -24,8 +24,7 @@ class Puzzle(db.Model):
         self.hint = kwargs.get("hint","")
     
 
-    #serialize has 3 additional fields for students, instructors, and assignments which contain
-    #serialized elements from other tables.
+    #serialize puzzle field
     def serialize(self):
         """
         Siderializes a Puzzle object
@@ -38,7 +37,7 @@ class Puzzle(db.Model):
 
 
         }
-    #simple serialize here returns course values that don't have personal 
+    #simple serialize here returns puzzle values that don't have personal
     #information about users, etc.
     def simple_serialize(self):
         """

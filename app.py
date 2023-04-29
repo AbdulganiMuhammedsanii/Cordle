@@ -26,7 +26,7 @@ def failure_response(message, code=404):
 # your routes here
 @app.route("/")
 @app.route("/api/puzzles/")
-def get_courses():
+def get_puzzles():
     """
     Endpoint for getting all puzzles  
     """
@@ -36,7 +36,7 @@ def get_courses():
 
 
 @app.route("/api/puzzles/", methods = ["POST"])
-def create_course():
+def create_puzzles():
     """
     Endpoint for creating a new puzzle  
     """
@@ -73,7 +73,7 @@ def get_specific_puzzle(puzzle_id):
 
 
 @app.route("/api/courses/<int:puzzle_id>/", methods=["DELETE"])
-def delete_course(puzzle_id):
+def delete_puzzle(puzzle_id):
     """
     Endpoint for deleting a puzzle by id
     """
