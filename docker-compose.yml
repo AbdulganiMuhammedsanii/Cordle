@@ -7,4 +7,4 @@ services:
             - /home/sl2658/cordle.db:/usr/app/instance/cordle.dg
     env_file: .env
     ports:
-      - "80:8000"
+      - "8000:8000"

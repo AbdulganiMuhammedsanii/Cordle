@@ -7,5 +7,7 @@ COPY . .
 
 RUN pip install -r requirements.txt
 
+RUN pip install bcrypt
+
 CMD python app.py
 

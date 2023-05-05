@@ -26,7 +26,7 @@ class Puzzle(db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
     word = db.Column(db.String, nullable=False)
     hint = db.Column(db.String, nullable=False)
-    users = db.relationship("Puzzle", secondary = assosciation_table, back_populates = "puzzles")
+    users = db.relationship("User", secondary = assosciation_table, back_populates = "puzzles")
 
 
     def __init__(self, **kwargs):
@@ -48,19 +48,6 @@ class Puzzle(db.Model):
             "id": self.id,
             "word": self.word,
             "hint": self.hint,
-        }
-    
-    #simple serialize here returns puzzle values that don't have personal
-    #information about users, etc.
-    def simple_serialize(self):
-        """
-        Siderializes a Task object
-        """
-
-        return {
-            "id": self.id,
-            "code": self.word,
-            "name": self.hint,
         }
     
 
@@ -128,8 +115,12 @@ class User(db.Model):
         """
         Serializes a User object.
         """
+        completed_ids = []
+        for a in self.puzzles:
+            completed_ids.append(a.id)
         return {
             "id": self.id,
             "email": self.email,
-            "puzzles" : [a.serialize() for a in self.puzzles]
+            "puzzles": [a.serialize() for a in self.puzzles],
+            "completed_ids": completed_ids
         }
