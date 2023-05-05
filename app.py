@@ -96,11 +96,8 @@ def get_number_of_puzzles():
     Endpoint for getting the number of puzzles in the database
     """
     query_set = Puzzle.query.all()
-    number = 0
-    for a in query_set:
-        number+=1
     
-    return success_response({"number of puzzles in database" : number}, 200)
+    return success_response({"number of puzzles in database" : query_set.length()}, 200)
 
 #-----USERS--------------------------------------------------------------------
 @app.route("/api/users/<int:user_id>/")
