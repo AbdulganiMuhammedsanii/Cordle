@@ -1,10 +1,10 @@
 import datetime
 import json
 
-from db import db
 from flask import Flask, request
-from db import Puzzle, User
+from db import Puzzle, User, db
 import users_dao
+import os
 
 app = Flask(__name__)
 db_filename = "cordle.db"
@@ -48,15 +48,13 @@ def create_puzzles():
     """
     #creates the new puzzle with the appropriate fields
     body = json.loads(request.data)
-    if body.get("word","") == "" and body.get("hint","") == "":
-        return failure_response("No puzzle word or hint!", 400)
-    if body.get("hint","") == "":
-        return failure_response("No puzzle hint!", 400)
-    if body.get("word",False) is False:
-        return failure_response("No puzzle word!", 400)
+    word = body.get("word")
+    hint = body.get("hint")
+    if word is None or word == "" or hint is None or hint is "":
+        return failure_response("Invalid word or hint", 400)
     new_puzzle = Puzzle(
-        word = body.get("word"),
-        hint = body.get("hint"),
+        word = word,
+        hint = hint,
     )
     #add new puzzle to the session and return it if successful
     db.session.add(new_puzzle)
@@ -87,16 +85,28 @@ def delete_puzzle(puzzle_id):
     #first querying that it is present in the list.
     puzzle = Puzzle.query.filter_by(id=puzzle_id).first()
     if puzzle is None:
-        return failure_response("Course not found!")
+        return failure_response("Puzzle not found!")
     db.session.delete(puzzle)
     db.session.commit()
     return success_response(puzzle.serialize(), 200)
+
+@app.route("/api/puzzles/number/")
+def get_number_of_puzzles():
+    """
+    Endpoint for getting the number of puzzles in the database
+    """
+    query_set = Puzzle.query.all()
+    number = 0
+    for a in query_set:
+        number+=1
+    
+    return success_response({"number of puzzles in database" : number}, 200)
 
 #-----USERS--------------------------------------------------------------------
 @app.route("/api/users/<int:user_id>/")
 def get_user(user_id):
     """
-    Endpoint for getting id, email, and completed puzzles for a user by id
+    Endpoint for getting a user by id
     """
     user = User.query.filter_by(id = user_id).first()
     if user is None:
@@ -116,10 +126,10 @@ def add_user(user_id):
     if not user_id:
         return failure_response("required fields not supplied", 400)
     puzzle = Puzzle.query.filter_by(id = puzzle_id).first()
-    if not puzzle_id:
+    if not puzzle:
         return failure_response("Invalid puzzle id", 400)
     
-    user.puzzles.append(user)
+    user.puzzles.append(puzzle)
     
     db.session.commit()
     
