@@ -44,3 +44,5 @@ Some areas we could potentially improvement:
 -Adding support for more complex puzzle types
 -Adding a more complex scoring system or leaderboards
 -Feel free to fork this repository and build upon it to create your own!
+<img width="608" alt="Instructions" src="https://github.com/AbdulganiMuhammedsanii/Cordle/assets/132167588/258e199b-4da3-4864-8610-d86bd7125417">
+<img width="608" alt="demoPage" src="https://github.com/AbdulganiMuhammedsanii/Cordle/assets/132167588/c4ef08ae-950a-4c54-965a-d26d05c2eab1">
